@@ -1,16 +1,52 @@
-from test import xml
+"""
+serie
+<serie>123</serie>
+
+identificação do cliente
+<idDest>3</idDest>
+
+cod do produto
+<cProd>8926.02.201</cProd>
+
+erro: nota fiscal que vem com o imposto errado.
+"""
+
+xml_string = '''<root>
+    <elemento1>Valor 1</elemento1>
+    <elemento2>Valor 2</elemento2>
+</root>'''
+
+import nota 
 from lxml import etree
+import xml.etree.ElementTree as ET
 
-arquivo = etree.fromstring(xml) 
+try:
+    arquivo = ET.fromstring(nota.xml)
 
-for  child in arquivo:
-    
-    print("sku:", child.attrib["sku"])
+    raiz = arquivo.find('.//{http://www.portalfiscal.inf.br/nfe}ide')
+    serie = raiz.findtext('{http://www.portalfiscal.inf.br/nfe}serie')
+    idDest = raiz.findtext('{http://www.portalfiscal.inf.br/nfe}idDest')
 
-    print("min:", child.find(".//min-order-quantity").text)  
+    # Encontrar o elemento <prod> e extrair o valor de <cProd>
+    det = arquivo.find('.//{http://www.portalfiscal.inf.br/nfe}det')
+    prod = det.find('.//{http://www.portalfiscal.inf.br/nfe}prod')
+    cProd = prod.findtext('{http://www.portalfiscal.inf.br/nfe}cProd')
 
-    print("step-quantity:", child.find(".//min-order-quantity").text)  
+    # Imprimir os valores extraídos
+    print("Valor de <serie>: ", serie)
+    print("Valor de <idDest>: ", idDest)
+    print("Valor de <cProd>: ", cProd)
 
-    print("step:" ,child.find(".//step-quantity").text)  
+except etree.XMLSyntaxError:
+    print("URL inválida")
 
-    print("\n")
+
+
+
+
+
+
+
+
+
+
