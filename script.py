@@ -16,48 +16,48 @@ from lxml import etree
 import xml.etree.ElementTree as ET
 import mysql.connector as mc
 
-try:
-    arquivo = ET.fromstring(nota.xml)
+def consumindoXml():
 
-    raiz = arquivo.find('.//{http://www.portalfiscal.inf.br/nfe}ide')
-    serie = raiz.findtext('{http://www.portalfiscal.inf.br/nfe}serie')
-    idDest = raiz.findtext('{http://www.portalfiscal.inf.br/nfe}idDest')
+    try:
+        arquivo = ET.fromstring(nota.xml)
 
-    # Encontrar o elemento <prod> e extrair o valor de <cProd>
-    det = arquivo.find('.//{http://www.portalfiscal.inf.br/nfe}det')
-    prod = det.find('.//{http://www.portalfiscal.inf.br/nfe}prod')
-    cProd = prod.findtext('{http://www.portalfiscal.inf.br/nfe}cProd')
+        raiz = arquivo.find('.//{http://www.portalfiscal.inf.br/nfe}ide')
+        serie = raiz.findtext('{http://www.portalfiscal.inf.br/nfe}serie')
+        idDest = raiz.findtext('{http://www.portalfiscal.inf.br/nfe}idDest')
 
-    conexao = mc.connect(
-    host="localhost",
-    user="thiago",
-    password="123",
-    database="nfse",
-    autocommit="True"
-    )
+        # Encontrar o elemento <prod> e extrair o valor de <cProd>
+        det = arquivo.find('.//{http://www.portalfiscal.inf.br/nfe}det')
+        prod = det.find('.//{http://www.portalfiscal.inf.br/nfe}prod')
+        cProd = prod.findtext('{http://www.portalfiscal.inf.br/nfe}cProd')
 
- 
-    if conexao.is_connected():
-        print("Conexão com o banco estabelecida!")
+        def enviandoProBanco():
 
-        cursor = conexao.cursor()
+            conexao = mc.connect(
+            host="localhost",
+            user="thiago",
+            password="123",
+            database="nfse",
+            autocommit="True"
+            )
 
-        cursor.execute("INSERT INTO notas VALUES (default, '%d', '%d', '%s')" % (int(serie), int(idDest), str(cProd)))
+        
+            if conexao.is_connected():
+                print("Conexão com o banco estabelecida!")
 
-        cursor2 = conexao.cursor()
+                cursor = conexao.cursor()
 
-        texto = cursor2.execute("select * from  notas")
-        print(texto)
+                cursor.execute("INSERT INTO notas VALUES (default, '%d', '%d', '%s')" % (int(serie), int(idDest), str(cProd)))
+                
+        
+        enviandoProBanco()
 
-        print("Enviado")
+
+    except etree.XMLSyntaxError:
+        print("URL inválida")
 
 
+consumindoXml()
 
-    # INSERT INTO produtos (serie, ident_cliente, cprod)
-    # VALUES ('Produto A', 'Descrição do Produto A', 49.99, 100);
-
-except etree.XMLSyntaxError:
-    print("URL inválida")
 
 
 
