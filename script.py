@@ -11,14 +11,10 @@ cod do produto
 erro: nota fiscal que vem com o imposto errado.
 """
 
-xml_string = '''<root>
-    <elemento1>Valor 1</elemento1>
-    <elemento2>Valor 2</elemento2>
-</root>'''
-
 import nota 
 from lxml import etree
 import xml.etree.ElementTree as ET
+import mysql.connector as mc
 
 try:
     arquivo = ET.fromstring(nota.xml)
@@ -32,10 +28,33 @@ try:
     prod = det.find('.//{http://www.portalfiscal.inf.br/nfe}prod')
     cProd = prod.findtext('{http://www.portalfiscal.inf.br/nfe}cProd')
 
-    # Imprimir os valores extraídos
-    print("Valor de <serie>: ", serie)
-    print("Valor de <idDest>: ", idDest)
-    print("Valor de <cProd>: ", cProd)
+    conexao = mc.connect(
+    host="localhost",
+    user="thiago",
+    password="123",
+    database="nfse",
+    autocommit="True"
+    )
+
+ 
+    if conexao.is_connected():
+        print("Conexão com o banco estabelecida!")
+
+        cursor = conexao.cursor()
+
+        cursor.execute("INSERT INTO notas VALUES (default, '%d', '%d', '%s')" % (int(serie), int(idDest), str(cProd)))
+
+        cursor2 = conexao.cursor()
+
+        texto = cursor2.execute("select * from  notas")
+        print(texto)
+
+        print("Enviado")
+
+
+
+    # INSERT INTO produtos (serie, ident_cliente, cprod)
+    # VALUES ('Produto A', 'Descrição do Produto A', 49.99, 100);
 
 except etree.XMLSyntaxError:
     print("URL inválida")
