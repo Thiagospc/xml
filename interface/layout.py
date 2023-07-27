@@ -39,22 +39,50 @@ while True:
     if event == sg.WIN_CLOSED or event == 'Exit' or event == 'Sair':
         break
 
-    if event == "Procurar Arquivo":
+    if event == "-ARQUIVO-":
+        
         pasta = values['-ARQUIVO-']
 
         try:
             fileList = os.listdir(pasta)
-        except:
-           fileList = []
 
-           fnames = [f for f in fileList if os.path.isfile(
-               os.path.join(pasta, f)) and f.lower().endswith((".py", ".xml", ".txt"))]
+            filesNames = []
+            
+
+            for i in fileList:
+                if i.endswith((".py", ".xml", ".txt")):
+                    filesNames.append(i)
+            
+            window['-LISTA-'].update(filesNames)
+
+        except:
            
-           window['-LISTA-'].update(fnames)
+           pass
+    
+    elif event == '-LISTA-':
+        fileName = os.path.join(values['-ARQUIVO-'], values['-LISTA-'][0])
 
     if event == "Buscar":
-        print("teste Buscar")
+        if fileName.lower().endswith(".txt"):
+            try:
+                with open(fileName, 'r') as arquivoInfo:
+                    conteudo = arquivoInfo.read()
+
+                window['-OUTPUT-'].update(conteudo)
+            except Exception as e:
+                window['-OUTPUT-'].update(f"Erro: {str(e)}")
         
+        elif fileName.lower().endswith(".py"):
+            try:
+                with open(fileName, 'r') as arquivoInfo:
+                    conteudo = arquivoInfo.read()
+
+                window['-OUTPUT-'].update(conteudo)
+            except Exception as e:
+                    window['-OUTPUT-'].update(f"Erro: {str(e)}")
+
+        else:
+            window['-OUTPUT-'].update("Arquivo não suportado!")
+            
 
 window.close()
-
